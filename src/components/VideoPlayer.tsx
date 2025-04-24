@@ -15,7 +15,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onProgressUpdate }) =>
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const progressUpdateIntervalRef = useRef<number | null>(null);
   
   const {
     intervals,
