@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -24,8 +24,22 @@ ChartJS.register(
 );
 
 const ProgressView: React.FC = () => {
-  const progress = getUserProgress();
-  
+  const [progress, setProgress] = useState(getUserProgress());
+
+  useEffect(() => {
+    // Listen for storage changes (e.g., when another tab updates progress)
+    const onStorage = () => setProgress(getUserProgress());
+    window.addEventListener('storage', onStorage);
+
+    // Poll for changes every second
+    const interval = setInterval(() => setProgress(getUserProgress()), 1000);
+
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      clearInterval(interval);
+    };
+  }, []);
+
   const chartData = {
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     datasets: [
