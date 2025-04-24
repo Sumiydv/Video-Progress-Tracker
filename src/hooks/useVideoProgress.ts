@@ -6,7 +6,8 @@ import {
 } from "../utils/intervalUtils";
 import { 
   saveVideoProgress, 
-  getVideoProgress 
+  getVideoProgress,
+  updateUserProgressFromAllVideos
 } from "../utils/storageUtils";
 
 interface VideoProgressHookProps {
@@ -64,7 +65,7 @@ export function useVideoProgress({
         totalDuration: duration,
       };
       saveVideoProgress(progressData);
-      
+      updateUserProgressFromAllVideos();
       const percentage = calculateProgressPercentage(intervals, duration);
       setProgressPercentage(percentage);
       console.log('[useVideoProgress] Intervals updated:', intervals);

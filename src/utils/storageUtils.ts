@@ -1,4 +1,6 @@
 import { VideoProgressData, UserSettings, UserProgress } from "../models/types";
+import { sampleVideos } from "../data/sampleVideos";
+import { calculateTotalWatchedTime, calculateProgressPercentage } from "./intervalUtils";
 
 const STORAGE_KEY_PREFIX = "video_progress_";
 const SETTINGS_KEY = "user_settings";
@@ -124,4 +126,42 @@ export function getUserProgress(): UserProgress {
     averageProgress: 0,
     weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
   };
+}
+
+export function updateUserProgressFromAllVideos() {
+  if (typeof window === "undefined") return;
+
+  let totalWatchTime = 0;
+  let completedVideos = 0;
+  let sumProgress = 0;
+  let videoCount = 0;
+
+  for (const video of sampleVideos) {
+    const progress = getVideoProgress(video.id);
+    if (progress) {
+      const watched = calculateTotalWatchedTime(progress.intervals);
+      totalWatchTime += watched;
+      const percent = calculateProgressPercentage(progress.intervals, video.duration);
+      sumProgress += percent;
+      if (percent === 100) completedVideos++;
+      videoCount++;
+    }
+  }
+
+  const averageProgress = videoCount > 0 ? Math.round(sumProgress / videoCount) : 0;
+
+  // Weekly progress: update today's value
+  const userProgress = getUserProgress();
+  const today = new Date().getDay(); // 0=Sunday, 1=Monday, ...
+  const weeklyProgress = Array.isArray(userProgress.weeklyProgress) ? [...userProgress.weeklyProgress] : [0,0,0,0,0,0,0];
+  weeklyProgress[today] = totalWatchTime / 60; // store minutes watched today
+
+  const newUserProgress = {
+    totalWatchTime,
+    completedVideos,
+    averageProgress,
+    weeklyProgress,
+  };
+  saveUserProgress(newUserProgress);
+  console.log('[storageUtils] Updated user progress:', newUserProgress);
 }
