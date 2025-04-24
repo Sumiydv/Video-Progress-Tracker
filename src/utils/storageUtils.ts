@@ -6,27 +6,78 @@ const PROGRESS_KEY = "user_progress";
 
 export function saveVideoProgress(progressData: VideoProgressData): void {
   const key = `${STORAGE_KEY_PREFIX}${progressData.videoId}`;
-  localStorage.setItem(key, JSON.stringify(progressData));
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(key, JSON.stringify(progressData));
+      console.log('[storageUtils] Saved video progress:', key, progressData);
+    } catch (e) {
+      console.warn("[storageUtils] Could not save progress:", e);
+    }
+  }
 }
 
 export function getVideoProgress(videoId: string): VideoProgressData | null {
   const key = `${STORAGE_KEY_PREFIX}${videoId}`;
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : null;
+  if (typeof window !== "undefined") {
+    try {
+      const data = localStorage.getItem(key);
+      console.log('[storageUtils] Loaded video progress:', key, data);
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      console.warn("[storageUtils] Could not load progress:", e);
+      return null;
+    }
+  }
+  return null;
 }
 
 export function clearVideoProgress(videoId: string): void {
   const key = `${STORAGE_KEY_PREFIX}${videoId}`;
-  localStorage.removeItem(key);
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(key);
+      console.log('[storageUtils] Cleared video progress:', key);
+    } catch (e) {
+      console.warn("[storageUtils] Could not clear progress:", e);
+    }
+  }
 }
 
 export function saveUserSettings(settings: UserSettings): void {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      console.log('[storageUtils] Saved user settings:', settings);
+    } catch (e) {
+      console.warn("[storageUtils] Could not save user settings:", e);
+    }
+  }
 }
 
 export function getUserSettings(): UserSettings {
-  const data = localStorage.getItem(SETTINGS_KEY);
-  return data ? JSON.parse(data) : {
+  if (typeof window !== "undefined") {
+    try {
+      const data = localStorage.getItem(SETTINGS_KEY);
+      console.log('[storageUtils] Loaded user settings:', data);
+      return data ? JSON.parse(data) : {
+        theme: 'light',
+        autoplay: true,
+        playbackSpeed: 1,
+        notifications: true,
+        subtitle: 'en',
+      };
+    } catch (e) {
+      console.warn("[storageUtils] Could not load user settings:", e);
+      return {
+        theme: 'light',
+        autoplay: true,
+        playbackSpeed: 1,
+        notifications: true,
+        subtitle: 'en',
+      };
+    }
+  }
+  return {
     theme: 'light',
     autoplay: true,
     playbackSpeed: 1,
@@ -36,12 +87,38 @@ export function getUserSettings(): UserSettings {
 }
 
 export function saveUserProgress(progress: UserProgress): void {
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+      console.log('[storageUtils] Saved user progress:', progress);
+    } catch (e) {
+      console.warn("[storageUtils] Could not save user progress:", e);
+    }
+  }
 }
 
 export function getUserProgress(): UserProgress {
-  const data = localStorage.getItem(PROGRESS_KEY);
-  return data ? JSON.parse(data) : {
+  if (typeof window !== "undefined") {
+    try {
+      const data = localStorage.getItem(PROGRESS_KEY);
+      console.log('[storageUtils] Loaded user progress:', data);
+      return data ? JSON.parse(data) : {
+        totalWatchTime: 0,
+        completedVideos: 0,
+        averageProgress: 0,
+        weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
+      };
+    } catch (e) {
+      console.warn("[storageUtils] Could not load user progress:", e);
+      return {
+        totalWatchTime: 0,
+        completedVideos: 0,
+        averageProgress: 0,
+        weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
+      };
+    }
+  }
+  return {
     totalWatchTime: 0,
     completedVideos: 0,
     averageProgress: 0,
